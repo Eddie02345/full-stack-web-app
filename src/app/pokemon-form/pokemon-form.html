@@ -1,0 +1,157 @@
+<main class="workbench">
+  <header class="workbench-header">
+    <div class="system-meta">
+      <span class="system-code">CSAPPD1 // LAB-06 & LAB-07</span>
+      <span class="system-author">Aquino, Edrel P.</span>
+    </div>
+    <div class="title-row">
+      <h1>Gary's Winning Team</h1>
+    </div>
+  </header>
+
+  <div class="workbench-body">
+    <!-- Form Panel -->
+    <section class="panel form-panel">
+      <div class="panel-heading">
+        <h2>{{ editingId() ? 'Update Entry' : 'Register Entry' }}</h2>
+        @if (editingId()) {
+          <span class="editing-indicator">Editing Mode</span>
+        } @else {
+          <span class="panel-note">All fields mandatory</span>
+        }
+      </div>
+
+      <form [formGroup]="pokemonForm" (ngSubmit)="onSubmit()" novalidate>
+        <div class="form-grid">
+          <div class="field" [class.has-error]="pokemonForm.controls.name.touched && pokemonForm.controls.name.invalid">
+            <div class="label-row">
+              <label for="name">Species / Name</label>
+              @if (pokemonForm.controls.name.touched && pokemonForm.controls.name.invalid) {
+                <span class="error-text" role="alert">Required</span>
+              }
+            </div>
+            <input 
+              id="name" 
+              type="text" 
+              formControlName="name" 
+              placeholder="e.g., Umbreon" 
+              autocomplete="off" 
+            />
+          </div>
+
+          <div class="field" [class.has-error]="pokemonForm.controls.type.touched && pokemonForm.controls.type.invalid">
+            <div class="label-row">
+              <label for="type">Elemental Type</label>
+              @if (pokemonForm.controls.type.touched && pokemonForm.controls.type.invalid) {
+                <span class="error-text" role="alert">Required</span>
+              }
+            </div>
+            <input 
+              id="type" 
+              type="text" 
+              formControlName="type" 
+              placeholder="e.g., Dark" 
+              autocomplete="off" 
+            />
+          </div>
+
+          <div class="field" [class.has-error]="pokemonForm.controls.level.touched && pokemonForm.controls.level.invalid">
+            <div class="label-row">
+              <label for="level">Current Level</label>
+              @if (pokemonForm.controls.level.touched && pokemonForm.controls.level.invalid) {
+                <span class="error-text" role="alert">Min. 1</span>
+              }
+            </div>
+            <input 
+              id="level" 
+              type="number" 
+              min="1" 
+              formControlName="level" 
+              placeholder="1" 
+            />
+          </div>
+
+          <div class="field" [class.has-error]="pokemonForm.controls.nature.touched && pokemonForm.controls.nature.invalid">
+            <div class="label-row">
+              <label for="nature">Inherent Nature</label>
+              @if (pokemonForm.controls.nature.touched && pokemonForm.controls.nature.invalid) {
+                <span class="error-text" role="alert">Required</span>
+              }
+            </div>
+            <input 
+              id="nature" 
+              type="text" 
+              formControlName="nature" 
+              placeholder="e.g., Calm" 
+              autocomplete="off" 
+            />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" [disabled]="pokemonForm.invalid">
+            {{ editingId() ? 'Apply Modifications' : 'Commit to Roster' }}
+          </button>
+          @if (editingId()) {
+            <button type="button" class="btn-cancel" (click)="cancelEdit()">
+              Discard Changes
+            </button>
+          }
+        </div>
+      </form>
+    </section>
+
+    <!-- Roster Display Panel -->
+    <section class="panel roster-panel">
+      <div class="panel-heading">
+        <h2>Active Roster</h2>
+        <span class="counter-badge">
+          {{ pokemonService.pokemonList().length }} Recorded
+        </span>
+      </div>
+
+      <div class="roster-list">
+        @for (p of pokemonService.pokemonList(); track p._id) {
+          <article class="roster-row" [class.is-editing]="editingId() === p._id">
+            <div class="spec-col">
+              <span class="level-indicator">LVL {{ p.level }}</span>
+              <h3 class="pokemon-name">{{ p.name }}</h3>
+            </div>
+            
+            <div class="traits-col">
+              <div class="trait">
+                <span class="trait-key">TYPE</span>
+                <span class="trait-val">{{ p.type }}</span>
+              </div>
+              <div class="trait">
+                <span class="trait-key">NATURE</span>
+                <span class="trait-val">{{ p.nature }}</span>
+              </div>
+            </div>
+
+            <div class="actions-col">
+              <button 
+                type="button" 
+                class="action-btn edit-btn" 
+                (click)="onEdit(p)"
+                title="Edit entry">
+                Edit
+              </button>
+              <button 
+                type="button" 
+                class="action-btn delete-btn" 
+                (click)="onDelete(p._id)"
+                title="Delete entry">
+                Delete
+              </button>
+            </div>
+          </article>
+        } @empty {
+          <div class="empty-tray">
+            <p>Database table empty. Submit valid parameters above to populate Gary's team.</p>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+</main>
